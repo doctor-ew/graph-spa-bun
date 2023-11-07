@@ -71,7 +71,7 @@ export default async function RickAndMortyPage() {
         });
 
         const json = await response.json();
-
+        console.log('|-o-| json: ',json);
         if (!response.ok) {
             throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
         }

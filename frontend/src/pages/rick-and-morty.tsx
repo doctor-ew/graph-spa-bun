@@ -2,6 +2,8 @@
 
 import React, {useEffect} from 'react';
 import {NextPageContext} from 'next';
+import '../styles/globals.css';
+
 
 // Define the types for the data you expect
 interface Rick {
