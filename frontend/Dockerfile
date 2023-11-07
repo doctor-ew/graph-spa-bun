@@ -13,8 +13,15 @@ RUN bun install
 # Copy the rest of your code
 COPY . .
 
-# Build the application (if you have a build script in your package.json)
-RUN bun run build
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# for deploting the build version
+
+# RUN bun next build
+# and
+# RUN bun next start
+
+RUN bun run dev
 
 # Expose the port Next.js will run on
 EXPOSE 3000
