@@ -1,0 +1,31 @@
+// /app/rick-and-morty/template.tsx
+
+import React from 'react';
+import CharacterGrid from '../../components/CharacterGrid'; // Update the import path as needed
+import {RickAndMortyProps} from './page'; // Import the props interface
+
+// The props for Template are destructured directly in the parameter list
+export default function Template({rickAndMortyAssociations, errors}: RickAndMortyProps) {
+
+    // Check for errors first
+    if (errors) {
+        console.error('|-E-|', errors);
+
+        return <div>Error: {errors}</div>;
+    }
+    let props = {rickAndMortyAssociations, errors};
+    //const { rickAndMortyAssociations, errors } = props;
+
+
+    // Render the CharacterGrid with the associations
+    console.log('|-RAMA-| rickAndMortyAssociations: ', rickAndMortyAssociations);
+
+    return (
+        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+            <div className="mx-auto p-4">
+                <h1 className="text-2xl font-bold mb-6">Rick and Morty Data</h1>
+                <CharacterGrid associations={rickAndMortyAssociations}/>
+            </div>
+        </main>
+    );
+}

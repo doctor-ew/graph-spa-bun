@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '4000:4000'
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/usr/src/app
+    environment:
+      - NODE_ENV=production
+    command: yarn start
+    networks:
+      - mynetwork
+
+  redis:
+    image: "redis:latest"
+    networks:
+      - mynetwork
+    ports:
+      - "6379:6379"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+      # Note: With Bun, you typically don't need to map the node_modules volume
+    environment:
+      - NODE_ENV=development
+    command: bun run dev
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
