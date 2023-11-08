@@ -1,3 +1,5 @@
+# /frontend/Dockerfile
+
 # Use the official Bun image
 FROM oven/bun:latest
 

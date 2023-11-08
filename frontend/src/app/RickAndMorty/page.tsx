@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 
 // Define the types for the data you expect
 interface Origin {
@@ -19,79 +20,75 @@ interface RickAndMortyAssociations {
     morties: Character[]; // An array of Morty objects
 }
 
-interface RickAndMortyProps {
-    rickAndMortyAssociations: RickAndMortyAssociations[];
-    errors?: string;
-}
-
 // This is the React component that represents the page content
-export default async function RickAndMortyPage() {
-    let props: RickAndMortyProps | undefined;
+export default function RickAndMortyPage() {
+    const [rickAndMortyAssociations, setRickAndMortyAssociations] = useState<RickAndMortyAssociations[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
-    try {
-        const response = await fetch('http://localhost:4000/rickmorty', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: `
-                    {
-                        rickAndMortyAssociations {
-                            rick {
-                                id
-                                name
-                                origin {
-                                    id
-                                    name
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const response = await fetch('http://backend:4000/rickmorty', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            {
+                                rickAndMortyAssociations {
+                                    rick {
+                                        id
+                                        name
+                                        origin {
+                                            id
+                                            name
+                                        }
+                                        location {
+                                            id
+                                            name
+                                        }
+                                        image
+                                    }
+                                    morties {
+                                        id
+                                        name
+                                        origin {
+                                            id
+                                            name
+                                        }
+                                        location {
+                                            id
+                                            name
+                                        }
+                                        image
+                                    }
                                 }
-                                location {
-                                    id
-                                    name
-                                }
-                                image
                             }
-                            morties {
-                                id
-                                name
-                                origin {
-                                    id
-                                    name
-                                }
-                                location {
-                                    id
-                                    name
-                                }
-                                image
-                            }
-                        }
-                    }
-                `,
-            }),
-        });
+                        `,
+                    }),
+                });
 
-        const json = await response.json();
-        console.log('|-o-| json: ',json);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+                const json = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+                }
+
+                if (json.errors) {
+                    throw new Error('Failed to fetch GraphQL data.');
+                }
+
+                setRickAndMortyAssociations(json.data.rickAndMortyAssociations);
+            } catch (e) {
+                setError(e instanceof Error ? e.message : 'An error occurred');
+            }
         }
 
-        if (json.errors) {
-            throw new Error('Failed to fetch GraphQL data.');
-        }
+        fetchData();
+    }, []);
 
-        props = { rickAndMortyAssociations: json.data.rickAndMortyAssociations };
-    } catch (error) {
-        return {
-            errors: error instanceof Error ? error.message : 'An error occurred',
-        };
-    }
-
-    // Use a React effect for logging or other side effects
-
-    // Render the component
-    if (props?.errors) {
-        return <div>Error: {props.errors}</div>;
+    if (error) {
+        return <div>Error: {error}</div>;
     }
 
     return (
@@ -99,7 +96,7 @@ export default async function RickAndMortyPage() {
             <div className="mx-auto p-4">
                 <h1 className="text-2xl font-bold mb-6">Rick and Morty Data</h1>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {props?.rickAndMortyAssociations?.map((association) => (
+                    {rickAndMortyAssociations.map((association) => (
                         <div key={association.rick.id} className="bg-white rounded-lg shadow-md p-4">
                             <div className="bg-gray-200 rounded-lg overflow-hidden">
                                 <div
@@ -128,4 +125,3 @@ export default async function RickAndMortyPage() {
         </main>
     );
 }
-

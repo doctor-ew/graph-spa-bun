@@ -14,12 +14,14 @@ services:
     environment:
       - NODE_ENV=development
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - backend
 
   redis:
     image: "redis:latest"
     networks:
-      - mynetwork
+      mynetwork:
     ports:
       - "6379:6379"
 
@@ -31,8 +33,12 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=development
+    depends_on:
+      - backend
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - frontend
 
 networks:
   mynetwork:
