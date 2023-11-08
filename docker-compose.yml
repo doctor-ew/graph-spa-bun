@@ -9,11 +9,10 @@ services:
       - '4000:4000'
     depends_on:
       - redis
-    volumes:
-      - ./backend:/usr/src/app
+    env_file:
+      - ./backend/.env
     environment:
-      - NODE_ENV=production
-    command: yarn start
+      - NODE_ENV=development
     networks:
       - mynetwork
 
@@ -30,12 +29,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    volumes:
-      - ./frontend:/app
-      # Note: With Bun, you typically don't need to map the node_modules volume
     environment:
       - NODE_ENV=development
-    command: bun run dev
     networks:
       - mynetwork
 

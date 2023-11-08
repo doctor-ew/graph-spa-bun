@@ -1,4 +1,7 @@
 {
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "test": "jest",
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
