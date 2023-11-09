@@ -1,0 +1,37 @@
+# src/graphql/rick-and-morty/schema.graphql
+
+type Character {
+    id: ID!
+    name: String!
+    status: String
+    species: String
+    type: String
+    gender: String
+    origin: Location
+    location: Location
+    image: String
+}
+
+type Episode {
+    id: ID!
+    name: String!
+}
+
+type Location {
+    id: ID
+    name: String
+}
+
+type Query {
+    charactersByName(name: String!): [Character]
+    episodesByIds(ids: [ID!]!): [Episode]
+}
+
+type RickAndMortyAssociation {
+    rick: Character!
+    morties: [Character!]!
+}
+
+extend type Query {
+    rickAndMortyAssociations: [RickAndMortyAssociation!]!
+}
