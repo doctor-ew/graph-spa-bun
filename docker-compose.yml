@@ -1,3 +1,4 @@
+# docker-compose
 version: '3.8'
 
 services:
@@ -9,18 +10,21 @@ services:
       - '4000:4000'
     depends_on:
       - redis
-    volumes:
-      - ./backend:/usr/src/app
+    env_file:
+      - ./backend/.env
     environment:
-      - NODE_ENV=production
-    command: yarn start
+      - NODE_ENV=development
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - backend
 
   redis:
     image: "redis:latest"
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - redis
     ports:
       - "6379:6379"
 
@@ -30,14 +34,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    volumes:
-      - ./frontend:/app
-      # Note: With Bun, you typically don't need to map the node_modules volume
     environment:
       - NODE_ENV=development
-    command: bun run dev
+    depends_on:
+      - backend
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - frontend
 
 networks:
   mynetwork:

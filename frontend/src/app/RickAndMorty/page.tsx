@@ -1,97 +1,132 @@
-import React from 'react';
+'use client';
+// /app/rick-and-morty.tsx
 
-// Define the types for the data you expect
-interface Origin {
+import React, {  useEffect } from 'react';
+import '@/styles/globals.css';
+
+// Your interface definitions
+interface Rick {
     id: string;
     name: string;
+    origin: { id: string; name: string };
+    location: { id: string; name: string };
+    image: string;
+    // ... other fields
 }
 
-interface Character {
+interface Morty {
     id: string;
     name: string;
-    origin: Origin;
-    location: Origin;
+    origin: { id: string; name: string };
+    location: { id: string; name: string };
     image: string;
+    // ... other fields
 }
 
 interface RickAndMortyAssociations {
-    rick: Character; // Not an array
-    morties: Character[]; // An array of Morty objects
+    rick: Rick;
+    morties: Morty[];
+}
+
+interface RickAndMortyData {
+    rickAndMortyAssociations: RickAndMortyAssociations[];
 }
 
 interface RickAndMortyProps {
-    rickAndMortyAssociations: RickAndMortyAssociations[];
-    errors?: string;
+    data?: RickAndMortyData;
+    error?: string;
 }
 
-// This is the React component that represents the page content
-export default async function RickAndMortyPage() {
-    let props: RickAndMortyProps | undefined;
-
+// The new loader function for server-side data fetching
+export async function loader() {
+    console.log('|-o-| loading');
     try {
-        const response = await fetch('http://localhost:4000/rickmorty', {
+        const res = await fetch('http://backend:4000/rickmorty', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                // Your GraphQL query
                 query: `
-                    {
-                        rickAndMortyAssociations {
-                            rick {
-                                id
-                                name
-                                origin {
-                                    id
-                                    name
-                                }
-                                location {
-                                    id
-                                    name
-                                }
-                                image
-                            }
-                            morties {
-                                id
-                                name
-                                origin {
-                                    id
-                                    name
-                                }
-                                location {
-                                    id
-                                    name
-                                }
-                                image
-                            }
-                        }
-                    }
-                `,
+          {
+            rickAndMortyAssociations {
+              rick {
+                id
+                name
+                status
+                species
+                type
+                gender
+                image
+               
+                origin {
+                    id
+                    name
+                }
+                location {
+                    id
+                    name
+                }    
+              }
+              morties {
+                id
+                name
+                status
+                species
+                type
+                gender
+                image
+                
+                 origin {
+                    id
+                    name
+                }
+                location {
+                    id
+                    name
+                }    
+              }
+            }
+          }
+        `,
             }),
         });
 
-        const json = await response.json();
-        console.log('|-o-| json: ',json);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        const data = await res.json();
+        console.log('|-o-| data:', data);
+        if (!res.ok) {
+            console.log('|-o-| error:', data);
+            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
 
-        if (json.errors) {
+        if (data.errors) {
+            console.log('|-o-| error:', data);
             throw new Error('Failed to fetch GraphQL data.');
         }
-
-        props = { rickAndMortyAssociations: json.data.rickAndMortyAssociations };
+        console.log('|-o-| data:', data.data);
+        return { data: data.data };
     } catch (error) {
+        console.log('|-o-| error:', error);
         return {
-            errors: error instanceof Error ? error.message : 'An error occurred',
+            error: error instanceof Error ? error.message : 'An error occurred',
         };
     }
+}
 
-    // Use a React effect for logging or other side effects
+// The React component for your page
+const RickAndMortyPage: React.FC<RickAndMortyProps> = ({ data, error }) => {
+    useEffect(() => {
+        console.log('|-D-| data:', data);
+        console.log('|-A-| data:', data?.rickAndMortyAssociations);
+        if (data) {
+            (window as any).myDebugData = data;
+        }
+    }, [data]);
 
-    // Render the component
-    if (props?.errors) {
-        return <div>Error: {props.errors}</div>;
+    if (error) {
+        console.log('|-o-| error:', error);
+        return <div>Error: {error}</div>;
     }
 
     return (
@@ -99,7 +134,7 @@ export default async function RickAndMortyPage() {
             <div className="mx-auto p-4">
                 <h1 className="text-2xl font-bold mb-6">Rick and Morty Data</h1>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {props?.rickAndMortyAssociations?.map((association) => (
+                    {data?.rickAndMortyAssociations?.map((association) => (
                         <div key={association.rick.id} className="bg-white rounded-lg shadow-md p-4">
                             <div className="bg-gray-200 rounded-lg overflow-hidden">
                                 <div
@@ -127,5 +162,6 @@ export default async function RickAndMortyPage() {
             </div>
         </main>
     );
-}
+};
 
+export default RickAndMortyPage;

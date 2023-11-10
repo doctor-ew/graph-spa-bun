@@ -1,10 +1,12 @@
+//src/server.ts
+
 import express, { Express, Request, Response, NextFunction } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
 import path from 'path';
 import rickMortyResolvers from './graphql/rickmorty/resolvers';
 import travelDataResolvers from './graphql/traveldata/resolvers';
-//import { RedisCache } from 'apollo-server-cache-redis';
+import { RedisCache } from 'apollo-server-cache-redis';
 
 const app: express.Application = express();
 const PORT = 4000;
@@ -12,28 +14,32 @@ const PORT = 4000;
 // Load type definitions for both endpoints
 const rickMortyTypeDefs = readFileSync(path.join(__dirname, 'graphql/rickmorty/schema.graphql'), 'utf-8');
 const travelDataTypeDefs = readFileSync(path.join(__dirname, 'graphql/traveldata/schema.graphql'), 'utf-8');
-/*
+
 const redisCache = new RedisCache({
     host: 'redis',
     port: 6379
 });
-*/
+
 // Create ApolloServer instances for both endpoints
 const rickMortyServer = new ApolloServer({
     typeDefs: rickMortyTypeDefs,
     resolvers: rickMortyResolvers,
+    cache: redisCache,
     context: ({ req, res }) => ({
         req,
         res,
+        cache: redisCache,
     })
 });
 
 const travelDataServer = new ApolloServer({
     typeDefs: travelDataTypeDefs,
     resolvers: travelDataResolvers,
+    cache: redisCache,
     context: ({ req, res }) => ({
         req,
         res,
+        cache: redisCache,
     })
 });
 
