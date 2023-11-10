@@ -17,5 +17,8 @@ resolver:
   package: graph
   filename_template: "{name}.resolvers.go"
 
+  # Skip generating resolver methods if they already exist
+# skip_runtime: true
+
 autobind:
   - "github.com/doctor-ew/graph-spa-bun/gobackend/graph/model"
