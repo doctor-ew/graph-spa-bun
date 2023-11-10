@@ -2,7 +2,7 @@
 
 # Use the official Bun image
 #FROM oven/bun:latest
-FROM node:20-alpine
+FROM node:20
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
@@ -16,7 +16,7 @@ COPY package.json yarn.lock ./
 #RUN bun install
 # Install dependencies using yarn
 # It's a good practice to install yarn explicitly as some base images might not have it pre-installed
-RUN npm install --global yarn && yarn install --frozen-lockfile
+RUN yarn install
 
 
 

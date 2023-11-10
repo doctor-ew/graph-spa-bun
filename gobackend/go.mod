@@ -1,6 +1,6 @@
-module gobackend
+module github.com/doctor-ew/graph-spa-bun/gobackend
 
-go 1.21
+go 1.21.4
 
 require (
 	github.com/99designs/gqlgen v0.17.40 // indirect

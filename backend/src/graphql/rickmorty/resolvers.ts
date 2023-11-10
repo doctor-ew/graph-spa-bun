@@ -1,3 +1,5 @@
+// src/graphql/rickmorty/resolvers.ts
+
 import axios from 'axios';
 
 // Helper function to determine if a Rick and Morty should be associated
@@ -37,7 +39,7 @@ const rickMortyResolvers = {
     Query: {
 
         charactersByName: async (_: any, args: { name: string }, context: any) => {
-            /*
+            /* */
             const cache = context.cache;
             if (context.cacheControl) {
                 context.cacheControl.setCacheHint({maxAge: 360, scope: 'PRIVATE'});
@@ -50,7 +52,7 @@ const rickMortyResolvers = {
                 // Deserialize the data when retrieving it from the cache
                 return JSON.parse(cachedData);
             }
-*/
+/* */
             const query = `
                 {
                     characters(filter: {name: "${args.name}"}) {
@@ -80,7 +82,7 @@ const rickMortyResolvers = {
 
                 let responseData = response.data.data.characters.results;
                 // Serialize the data before storing it in the cache
-               //await cache.set(cacheKey, JSON.stringify(responseData), {ttl: 5});
+               await cache.set(cacheKey, JSON.stringify(responseData), {ttl: 5});
 
                 return responseData;
             } catch (error) {
@@ -88,17 +90,7 @@ const rickMortyResolvers = {
                 return [];
             }
         },
-/*
-        episodesByIds: async (_: any, args: { ids: number[] }) => {
-            try {
-                const response = await axios.get(`https://rickandmortyapi.com/api/episode/${args.ids.join(',')}`);
-                return Array.isArray(response.data) ? response.data : [response.data];
-            } catch (error) {
-                console.error("Error fetching episodes:", error);
-                return [];
-            }
-        },
-*/
+
         rickAndMortyAssociations: async (_: any, _args: any, context: any) => {
             const ricks = await rickMortyResolvers.Query.charactersByName(_, {name: "Rick"}, context);
             const morties = await rickMortyResolvers.Query.charactersByName(_, {name: "Morty"}, context);

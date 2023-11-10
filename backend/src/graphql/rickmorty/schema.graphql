@@ -1,3 +1,5 @@
+# src/graphql/rick-and-morty/schema.graphql
+
 type Character {
     id: ID!
     name: String!

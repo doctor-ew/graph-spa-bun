@@ -1,93 +1,131 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+// /app/rick-and-morty.tsx
 
-// Define the types for the data you expect
-interface Origin {
+import React, {  useEffect } from 'react';
+import '@/styles/globals.css';
+
+// Your interface definitions
+interface Rick {
     id: string;
     name: string;
+    origin: { id: string; name: string };
+    location: { id: string; name: string };
+    image: string;
+    // ... other fields
 }
 
-interface Character {
+interface Morty {
     id: string;
     name: string;
-    origin: Origin;
-    location: Origin;
+    origin: { id: string; name: string };
+    location: { id: string; name: string };
     image: string;
+    // ... other fields
 }
 
 interface RickAndMortyAssociations {
-    rick: Character; // Not an array
-    morties: Character[]; // An array of Morty objects
+    rick: Rick;
+    morties: Morty[];
 }
 
-// This is the React component that represents the page content
-export default function RickAndMortyPage() {
-    const [rickAndMortyAssociations, setRickAndMortyAssociations] = useState<RickAndMortyAssociations[]>([]);
-    const [error, setError] = useState<string | null>(null);
+interface RickAndMortyData {
+    rickAndMortyAssociations: RickAndMortyAssociations[];
+}
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await fetch('http://backend:4000/rickmorty', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: `
-                            {
-                                rickAndMortyAssociations {
-                                    rick {
-                                        id
-                                        name
-                                        origin {
-                                            id
-                                            name
-                                        }
-                                        location {
-                                            id
-                                            name
-                                        }
-                                        image
-                                    }
-                                    morties {
-                                        id
-                                        name
-                                        origin {
-                                            id
-                                            name
-                                        }
-                                        location {
-                                            id
-                                            name
-                                        }
-                                        image
-                                    }
-                                }
-                            }
-                        `,
-                    }),
-                });
+interface RickAndMortyProps {
+    data?: RickAndMortyData;
+    error?: string;
+}
 
-                const json = await response.json();
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+// The new loader function for server-side data fetching
+export async function loader() {
+    console.log('|-o-| loading');
+    try {
+        const res = await fetch('http://backend:4000/rickmorty', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // Your GraphQL query
+                query: `
+          {
+            rickAndMortyAssociations {
+              rick {
+                id
+                name
+                status
+                species
+                type
+                gender
+                image
+               
+                origin {
+                    id
+                    name
                 }
-
-                if (json.errors) {
-                    throw new Error('Failed to fetch GraphQL data.');
+                location {
+                    id
+                    name
+                }    
+              }
+              morties {
+                id
+                name
+                status
+                species
+                type
+                gender
+                image
+                
+                 origin {
+                    id
+                    name
                 }
-
-                setRickAndMortyAssociations(json.data.rickAndMortyAssociations);
-            } catch (e) {
-                setError(e instanceof Error ? e.message : 'An error occurred');
+                location {
+                    id
+                    name
+                }    
+              }
             }
+          }
+        `,
+            }),
+        });
+
+        const data = await res.json();
+        console.log('|-o-| data:', data);
+        if (!res.ok) {
+            console.log('|-o-| error:', data);
+            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
 
-        fetchData();
-    }, []);
+        if (data.errors) {
+            console.log('|-o-| error:', data);
+            throw new Error('Failed to fetch GraphQL data.');
+        }
+        console.log('|-o-| data:', data.data);
+        return { data: data.data };
+    } catch (error) {
+        console.log('|-o-| error:', error);
+        return {
+            error: error instanceof Error ? error.message : 'An error occurred',
+        };
+    }
+}
+
+// The React component for your page
+const RickAndMortyPage: React.FC<RickAndMortyProps> = ({ data, error }) => {
+    useEffect(() => {
+        console.log('|-D-| data:', data);
+        console.log('|-A-| data:', data?.rickAndMortyAssociations);
+        if (data) {
+            (window as any).myDebugData = data;
+        }
+    }, [data]);
 
     if (error) {
+        console.log('|-o-| error:', error);
         return <div>Error: {error}</div>;
     }
 
@@ -96,7 +134,7 @@ export default function RickAndMortyPage() {
             <div className="mx-auto p-4">
                 <h1 className="text-2xl font-bold mb-6">Rick and Morty Data</h1>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {rickAndMortyAssociations.map((association) => (
+                    {data?.rickAndMortyAssociations?.map((association) => (
                         <div key={association.rick.id} className="bg-white rounded-lg shadow-md p-4">
                             <div className="bg-gray-200 rounded-lg overflow-hidden">
                                 <div
@@ -124,4 +162,6 @@ export default function RickAndMortyPage() {
             </div>
         </main>
     );
-}
+};
+
+export default RickAndMortyPage;

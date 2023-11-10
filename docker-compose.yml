@@ -1,3 +1,4 @@
+# docker-compose
 version: '3.8'
 
 services:
@@ -22,6 +23,8 @@ services:
     image: "redis:latest"
     networks:
       mynetwork:
+        aliases:
+          - redis
     ports:
       - "6379:6379"
 
