@@ -234,6 +234,8 @@ Temporary Items
 .apdisk
 
 # Terraform
+.terraform/
+terraform-config/.terraform/
 **/.terraform/*
 *.tfstate
 *.tfstate.*.backup
