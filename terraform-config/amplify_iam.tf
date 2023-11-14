@@ -29,7 +29,7 @@ resource "aws_iam_policy" "amplify_policy" {
           "cloudfront:CreateDistribution",
           // Include additional permissions as needed
         ],
-        Effect = "Allow",
+        Effect   = "Allow",
         Resource = "*",
       },
     ],

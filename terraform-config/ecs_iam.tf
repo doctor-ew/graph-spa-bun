@@ -32,7 +32,7 @@ resource "aws_iam_policy" "ecs_task_execution_policy" {
           "ecr:BatchGetImage",
           // Include additional permissions as needed
         ],
-        Effect = "Allow",
+        Effect   = "Allow",
         Resource = "*",
       },
     ],

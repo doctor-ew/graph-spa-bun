@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "backend_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = "your-execution-role-arn" # Replace with your role ARN
+  execution_role_arn       = "arn:aws:iam::432230020714:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS" # Replace with your role ARN
 
   container_definitions = jsonencode([{
     name  = "backend"
