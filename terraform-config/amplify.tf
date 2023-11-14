@@ -2,7 +2,7 @@ resource "aws_amplify_app" "my_app" {
   name = "my-amplify-app"
 
   // Replace with your repository details
-  repository  = "https://github.com/doctor-ew/graph-spa-bun"
+  repository = "https://github.com/doctor-ew/graph-spa-bun"
 
   // Environment variables
   environment_variables = {
