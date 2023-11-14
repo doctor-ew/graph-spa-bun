@@ -18,7 +18,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Build the application for production
-#RUN bun run build
+RUN bun run build
 
 # Expose the port Next.js will run on
 EXPOSE 3000
