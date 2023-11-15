@@ -87,16 +87,15 @@ resource "aws_amplify_webhook" "webhook" {
 }
 
 #resource "aws_route53_record" "frontend_dns" {
-  zone_id = "Z725VNARWWWV9"
-  name    = "bang.doctorew.com"
-  type    = "A"
-  alias {
-    name                   = aws_amplify_app.bang_frontend_app.default_domain
-    zone_id                = "Z725VNARWWWV9"
-    evaluate_target_health = false
-  }
-}
-
+#  zone_id = "Z725VNARWWWV9"
+#  name    = "bang.doctorew.com"
+#  type    = "A"
+#  alias {
+#    name                   = aws_amplify_app.bang_frontend_app.default_domain
+#    zone_id                = "Z725VNARWWWV9"
+#    evaluate_target_health = false
+#  }
+#}
 # Redis with ElastiCache
 resource "aws_elasticache_cluster" "redis_cache" {
   cluster_id           = "redis-cluster"
