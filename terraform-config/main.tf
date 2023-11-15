@@ -7,26 +7,60 @@ provider "aws" {
   }
 }
 
-# Networking
+# Existing VPC and the first public subnet
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
+# Internet Gateway for the VPC
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+}
 
+# Route Table for the Internet Gateway
+resource "aws_route_table" "main" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+}
+
+# Associate Route Table with the subnets
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.main.id
+}
+
+resource "aws_route_table_association" "public_secondary" {
+  subnet_id      = aws_subnet.public_secondary.id
+  route_table_id = aws_route_table.main.id
+}
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone       = "us-east-1a" # Adjust the AZ as per your requirement
 }
 
-resource "aws_security_group" "allow_all" {
-  vpc_id = aws_vpc.main.id
-  # Ingress and Egress rules...
+# Additional public subnet in a different Availability Zone
+resource "aws_subnet" "public_secondary" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24" # Ensure this CIDR block is different and does not overlap with the first subnet
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1b" # Choose a different AZ
+}
+
+variable "github_oauth_token" {
+  description = "GitHub OAuth token"
+  type        = string
 }
 
 # AWS Amplify for Frontend
 resource "aws_amplify_app" "frontend_app" {
-  name       = "frontend-app"
-  repository = "https://github.com/doctor-ew/graph-spa-bun"
+  name        = "frontend-app"
+  repository  = "https://github.com/doctor-ew/graph-spa-bun"
+  oauth_token = var.github_oauth_token
   # Additional configurations...
 }
 
@@ -41,7 +75,7 @@ resource "aws_amplify_domain_association" "frontend_domain" {
   domain_name = "doctorew.com"
 
   sub_domain {
-    prefix      = "www"
+    prefix      = "bang"
     branch_name = aws_amplify_branch.main_branch.branch_name
   }
 }
@@ -52,16 +86,16 @@ resource "aws_amplify_webhook" "webhook" {
   # Additional configurations...
 }
 
-resource "aws_route53_record" "frontend_dns" {
-  zone_id = "Z2FDTNDATAQYW2"
-  name    = "bang.doctorew.com"
-  type    = "A"
-  alias {
-    name                   = aws_amplify_app.frontend_app.default_domain
-    zone_id                = "Z2FDTNDATAQYW2"
-    evaluate_target_health = false
-  }
-}
+#resource "aws_route53_record" "frontend_dns" {
+#  zone_id = "Z725VNARWWWV9"
+#  name    = "bang.doctorew.com"
+#  type    = "A"
+#  alias {
+#    name                   = aws_amplify_app.frontend_app.default_domain
+#    zone_id                = "Z725VNARWWWV9"
+#    evaluate_target_health = false
+#  }
+#}
 # Redis with ElastiCache
 resource "aws_elasticache_cluster" "redis_cache" {
   cluster_id           = "redis-cluster"
@@ -78,7 +112,25 @@ resource "aws_elasticache_subnet_group" "example" {
   subnet_ids = [aws_subnet.public.id]
 }
 
-# IAM Role for ECS Task Execution
+# Security Group
+resource "aws_security_group" "allow_all" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 # IAM Role for ECS Task Execution
 resource "aws_iam_role" "ecs_execution_role" {
   name = "ecs_execution_role"
@@ -97,13 +149,13 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 }
 
-# Application Load Balancer for Backend
+# Update Load Balancer to use both subnets
 resource "aws_lb" "backend_alb" {
   name               = "graphql-backend-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.allow_all.id]
-  subnets            = [aws_subnet.public.id]
+  subnets            = [aws_subnet.public.id, aws_subnet.public_secondary.id]
 }
 
 resource "aws_lb_listener" "backend_listener" {
