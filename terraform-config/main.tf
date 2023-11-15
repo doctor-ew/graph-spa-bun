@@ -57,21 +57,21 @@ variable "github_oauth_token" {
 }
 
 # AWS Amplify for Frontend
-resource "aws_amplify_app" "frontend_app" {
-  name        = "frontend-app"
+resource "aws_amplify_app" "bang_frontend_app" {
+  name        = "bang-frontend-app"
   repository  = "https://github.com/doctor-ew/graph-spa-bun"
   oauth_token = var.github_oauth_token
   # Additional configurations...
 }
 
 resource "aws_amplify_branch" "main_branch" {
-  app_id      = aws_amplify_app.frontend_app.id
+  app_id      = aws_amplify_app.bang_frontend_app.id
   branch_name = "main"
   # Additional configurations...
 }
 
 resource "aws_amplify_domain_association" "frontend_domain" {
-  app_id      = aws_amplify_app.frontend_app.id
+  app_id      = aws_amplify_app.bang_frontend_app.id
   domain_name = "doctorew.com"
 
   sub_domain {
@@ -81,21 +81,22 @@ resource "aws_amplify_domain_association" "frontend_domain" {
 }
 
 resource "aws_amplify_webhook" "webhook" {
-  app_id      = aws_amplify_app.frontend_app.id
+  app_id      = aws_amplify_app.bang_frontend_app.id
   branch_name = aws_amplify_branch.main_branch.branch_name
   # Additional configurations...
 }
 
 #resource "aws_route53_record" "frontend_dns" {
-#  zone_id = "Z725VNARWWWV9"
-#  name    = "bang.doctorew.com"
-#  type    = "A"
-#  alias {
-#    name                   = aws_amplify_app.frontend_app.default_domain
-#    zone_id                = "Z725VNARWWWV9"
-#    evaluate_target_health = false
-#  }
-#}
+  zone_id = "Z725VNARWWWV9"
+  name    = "bang.doctorew.com"
+  type    = "A"
+  alias {
+    name                   = aws_amplify_app.bang_frontend_app.default_domain
+    zone_id                = "Z725VNARWWWV9"
+    evaluate_target_health = false
+  }
+}
+
 # Redis with ElastiCache
 resource "aws_elasticache_cluster" "redis_cache" {
   cluster_id           = "redis-cluster"
@@ -189,14 +190,24 @@ resource "aws_route53_record" "backend_dns" {
   }
 }
 
+resource "aws_ecr_repository" "backend_image_repo" {
+  name                 = "graph-backend-image" // Name of your repository
+  image_tag_mutability = "MUTABLE"
+}
+
+output "ecr_repository_url" {
+  value = aws_ecr_repository.backend_image_repo.repository_url
+}
+
+
 # ECS Cluster (Placeholder - replace with your actual configuration)
-resource "aws_ecs_cluster" "cluster" {
-  name = "my-cluster"
+resource "aws_ecs_cluster" "graph_cluster" {
+  name = "graph-cluster"
 }
 
 # ECS Task Definition (Placeholder - replace with your actual configuration)
-resource "aws_ecs_task_definition" "backend" {
-  family                   = "backend"
+resource "aws_ecs_task_definition" "graph_backend" {
+  family                   = "graph_backend"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
@@ -205,7 +216,7 @@ resource "aws_ecs_task_definition" "backend" {
   container_definitions    = <<DEFINITION
 [{
   "name": "backend",
-  "image": "backend-image-url",
+  "image": "${aws_ecr_repository.backend_image_repo.repository_url}:latest",
   "essential": true,
   "portMappings": [{
     "containerPort": 4000,
@@ -220,8 +231,8 @@ DEFINITION
 # Fargate Services
 resource "aws_ecs_service" "backend_service" {
   name            = "backend-service"
-  cluster         = aws_ecs_cluster.cluster.id
-  task_definition = aws_ecs_task_definition.backend.arn
+  cluster         = aws_ecs_cluster.graph_cluster.id
+  task_definition = aws_ecs_task_definition.graph_backend.arn
   launch_type     = "FARGATE"
   network_configuration {
     subnets         = [aws_subnet.public.id]
@@ -231,7 +242,7 @@ resource "aws_ecs_service" "backend_service" {
 
 # Output for Amplify App CloudFront URL (optional)
 output "amplify_app_cloudfront_url" {
-  value = aws_amplify_app.frontend_app.default_domain
+  value = aws_amplify_app.bang_frontend_app.default_domain
 }
 
 # Additional Terraform configurations might be required based on your specific requirements
