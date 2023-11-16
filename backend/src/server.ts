@@ -1,6 +1,7 @@
 //src/server.ts
 
 import express, { Express, Request, Response, NextFunction } from 'express';
+
 import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
 import path from 'path';
@@ -42,6 +43,21 @@ const travelDataServer = new ApolloServer({
         cache: redisCache,
     })
 });
+
+// Health Check Endpoint
+app.get('/health', async (req: Request, res: Response) => {
+    try {
+        // Optional: Check Redis connection
+        await redisCache.get('health-check');
+
+        // Send a positive response if everything is fine
+        res.status(200).send('OK');
+    } catch (error) {
+        // If Redis is down or any error occurs, send a failure response
+        res.status(500).send('Error');
+    }
+});
+
 
 // Create an asynchronous function to start the servers and apply middleware
 async function startServer() {
