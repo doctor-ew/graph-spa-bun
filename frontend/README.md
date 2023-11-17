@@ -1,6 +1,24 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Graph SPA Bun - Rick and Morty Application
+## Overview
+This is a Next.js project, bootstrapped with create-next-app, showcasing a rich, interactive experience with the characters from the Rick and Morty series. The project uses modern web technologies to deliver a fast and responsive Progressive Web App (PWA).
 
-## Getting Started
+### Visit the live application: [Rick and Morty PWA](https://pwag.doctorew.com/rick-and-morty)
+
+### Architecture
+#### Frontend
+* Technology: Next.js
+* Deployment: AWS Amplify
+* Custom Domain: Hosted with a custom subdomain for a seamless user experience.
+* Features: Utilizes next/font for font optimization and loading custom Google Fonts.
+
+#### Backend
+* Technology: Node.js (planned to refactor to Golang)
+* Deployment: AWS Lambda@Edge via serverless framework
+* Custom Domain: Integrated with a custom subdomain.
+* Data Store: Currently using in-memory storage, with plans to move to Redis/ElastiCache on AWS Fargate.
+
+
+### Getting Started
 
 First, run the development server:
 
@@ -20,17 +38,27 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+### File Structure
+* app/page.tsx: The main page file which can be edited and will auto-update as you develop.
 
-To learn more about Next.js, take a look at the following resources:
+### Upcoming Features
+#### Frontend (FE)
+* Landing Page: An engaging and informative first point of contact for users.
+* Infinite Scroll: Implementing infinite scrolling for a seamless browsing experience.
+* Graph Pagination: Enhancements in data fetching to support pagination at the GraphQL level.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### Backend (BE)
+* Golang Refactoring: Transitioning the backend service from Node.js to Golang for improved performance.
+* Redis/ElastiCache Integration: Migrating to AWS ElastiCache for scalable and efficient caching, hosted on AWS Fargate.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Learn More
+* [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API.
+* [Learn Next.js](https://nextjs.org/learn) - An interactive Next.js tutorial.
+Contributions
 
-## Deploy on Vercel
+### Contributions
+Feel free to check out the Next.js GitHub repository and contribute. Your feedback and contributions are highly appreciated!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Deployment
+Deploying with AWS Amplify
+This application is deployed using AWS Amplify, which provides a CI/CD pipeline and hosting for Next.js applications. For more information, check out [Next.js on AWS Amplify](https://docs.amplify.aws/start/q/integration/next).

@@ -23,6 +23,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.0.1",
     "postcss": "^8",
+    "serverless-domain-manager": "^7.1.2",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }

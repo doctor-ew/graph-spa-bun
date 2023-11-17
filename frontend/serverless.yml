@@ -1,0 +1,20 @@
+service: nextjs-app
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: dev # default stage
+
+plugins:
+  - serverless-next.js
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: pwa-graph.doctorew.com
+    stage: ${self:provider.stage}
+    basePath: ''
+    certificateName: '*.doctorew.com'
+    createRoute53Record: true
+    endpointType: 'edge' # Use 'regional' or 'edge' if you prefer an edge-optimized setup
+    securityPolicy: tls_1_2
