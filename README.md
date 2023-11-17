@@ -1,4 +1,4 @@
-# graph-spa-bun
+# graph-pwa/spa
 
 ## Overview
 graph-spa-bun is a full-stack application showcasing a modern approach to querying and displaying data from the "Rick and Morty" API. The backend is powered by AWS Lambda and Serverless framework, enabling scalable cloud-based operations. The frontend, built with Next.js and leveraging Bun for an optimized runtime environment, provides a responsive and dynamic user experience.
