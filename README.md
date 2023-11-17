@@ -11,7 +11,7 @@ graph-spa-bun is a full-stack application showcasing a modern approach to queryi
 
 ## Getting Started
 ### Prerequisites
-- Node.js (Version x.x.x or higher)
+- Node.js (Version 18.x.x or higher)
 - Bun runtime environment
 - AWS CLI (configured with credentials)
 - Serverless Framework
