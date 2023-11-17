@@ -1,0 +1,32 @@
+org: doctorew
+app: graph-backend-ts
+service: graph-backend-lambda
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: dev # default stage
+
+functions:
+  myFunction:
+    handler: dist/server-lambda.handler
+    events:
+      - http:
+          path: /rickmorty
+          method: post
+
+plugins:
+  - serverless-offline
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: graph-ts.doctorew.com
+    stage: ${self:provider.stage}
+    basePath: ''
+    certificateName: '*.doctorew.com'
+    createRoute53Record: true
+    endpointType: 'edge' # Use 'regional' or 'edge' if you prefer an edge-optimized setup
+    securityPolicy: tls_1_2
+

@@ -156,7 +156,7 @@ dist
 .vuepress/dist
 
 # Serverless directories
-.serverless/
+backend/.serverless/
 
 # FuseBox cache
 .fusebox/

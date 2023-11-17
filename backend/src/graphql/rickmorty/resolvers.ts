@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 // Helper function to determine if a Rick and Morty should be associated
-const shouldAssociate = (rick:any, morty:any) => {
+const shouldAssociate = (rick: any, morty: any) => {
     console.log(`|-SA-| 0) Checking association for Rick: ${JSON.stringify(rick)} :: Morty: ${JSON.stringify(morty)}`);
 
     // Match by origin id
@@ -34,25 +34,9 @@ const shouldAssociate = (rick:any, morty:any) => {
 };
 
 
-
 const rickMortyResolvers = {
     Query: {
-
-        charactersByName: async (_: any, args: { name: string }, context: any) => {
-            /* */
-            const cache = context.cache;
-            if (context.cacheControl) {
-                context.cacheControl.setCacheHint({maxAge: 360, scope: 'PRIVATE'});
-            }
-
-            const cacheKey = `charactersByName:${args.name}`;
-            const cachedData = await cache.get(cacheKey);
-
-            if (cachedData) {
-                // Deserialize the data when retrieving it from the cache
-                return JSON.parse(cachedData);
-            }
-/* */
+        charactersByName: async (_: any, args: { name: string }) => {
             const query = `
                 {
                     characters(filter: {name: "${args.name}"}) {
@@ -72,45 +56,40 @@ const rickMortyResolvers = {
                                 id
                                 name
                             }
-                           
                         }
                     }
                 }`;
 
             try {
                 const response = await axios.post('https://rickandmortyapi.com/graphql', {query});
-
-                let responseData = response.data.data.characters.results;
-                // Serialize the data before storing it in the cache
-               await cache.set(cacheKey, JSON.stringify(responseData), {ttl: 5});
-
-                return responseData;
+                return response.data.data.characters.results;
             } catch (error) {
                 console.error("Error fetching characters:", error);
                 return [];
             }
         },
 
-        rickAndMortyAssociations: async (_: any, _args: any, context: any) => {
-            const ricks = await rickMortyResolvers.Query.charactersByName(_, {name: "Rick"}, context);
-            const morties = await rickMortyResolvers.Query.charactersByName(_, {name: "Morty"}, context);
+        rickAndMortyAssociations: async () => {
+            try {
+                const ricksResponse = await axios.get('https://rickandmortyapi.com/api/character/?name=Rick');
+                const mortiesResponse = await axios.get('https://rickandmortyapi.com/api/character/?name=Morty');
 
-            return ricks.map((rick: any) => {
-                // Find the correct Morty that matches the Rick
-                const associatedMorty = morties.find((morty: any) => shouldAssociate(rick, morty));
+                const ricks = ricksResponse.data.results;
+                const morties = mortiesResponse.data.results;
 
-                console.log('|-aM-| associatedMorty: ', associatedMorty);
-                console.log('|-RaM-| rick: ',rick,' :: associatedMorty: ',associatedMorty);
-                // Return the Rick with the associated Morty (if any)
-                return {
-                    rick,
-                    morties: associatedMorty ? [associatedMorty] : [] // Wrap the single Morty in an array
-                };
-            });
+                return ricks.map((rick: any) => {
+                    const associatedMorty = morties.find((morty: any) => shouldAssociate(rick, morty));
+                    return {
+                        rick,
+                        morties: associatedMorty ? [associatedMorty] : []
+                    };
+                });
+            } catch (error) {
+                console.error("Error in rickAndMortyAssociations:", error);
+                return [];
+            }
         },
-
-
     }
 };
 
-export default rickMortyResolvers
+export default rickMortyResolvers;
