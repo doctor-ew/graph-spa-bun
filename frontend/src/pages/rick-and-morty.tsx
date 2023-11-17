@@ -94,7 +94,7 @@ const RickAndMortyPage: React.FC<RickAndMortyProps> = ({ data, errors }) => {
 // This function runs on the server and gets the data for the page
 export async function getServerSideProps(context: NextPageContext): Promise<{ props: RickAndMortyProps }> {
     try {
-        const res = await fetch('http://backend:4000/rickmorty', {
+        const res = await fetch('https://graph-ts.doctorew.com/rickmorty', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

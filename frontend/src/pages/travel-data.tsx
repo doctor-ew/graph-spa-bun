@@ -34,7 +34,7 @@ const TravelDataPage: React.FC<TravelDataProps> = ({ bookings, error }) => {
 
 export async function getServerSideProps(context: NextPageContext): Promise<{ props: TravelDataProps }> {
     try {
-        const response = await fetch('http://localhost:4000/traveldata', {
+        const response = await fetch('https://graph-ts.doctorew.com/traveldata', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
