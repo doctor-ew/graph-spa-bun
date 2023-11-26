@@ -33,6 +33,18 @@ const shouldAssociate = (rick: any, morty: any) => {
     return false;
 };
 
+type PocketMortyData = {
+    assetid: string;
+    alias: string | null;
+    dimensions: string | null;
+    name: string;
+};
+
+type PocketNPCData = {
+    alias: string | null;
+    npc_name: string;
+};
+
 const rickMortyResolvers = {
     Query: {
         // Resolves characters by name
@@ -102,6 +114,58 @@ const rickMortyResolvers = {
                 return [];
             }
         },
+        pocketMortys: async () => {
+            try {
+                const response = await axios.get('https://pocketmortys.net/components/com_pocketmortys/json/datatables/MortysTable_en.json');
+                return response?.data?.data?.map((pocketMorty: PocketMortyData) => ({
+                    assetid: pocketMorty.assetid,
+                    alias: pocketMorty.alias,
+                    dimensions: pocketMorty.dimensions,
+                    name: pocketMorty.name
+                }));
+            } catch (error) {
+                console.error("Error fetching PocketMortys data:", error);
+                return [];
+            }
+        },
+
+        // New resolver to fetch a specific Morty by assetid
+        pocketMorty: async (_: any, args: { assetid: string }) => {
+            try {
+                const response = await axios.get('https://pocketmortys.net/components/com_pocketmortys/json/datatables/MortysTable_en.json');
+                return response?.data?.data?.find((pocketMorty: PocketMortyData) => pocketMorty.assetid === args.assetid);
+            } catch (error) {
+                console.error("Error fetching Morty:", error);
+                return null;
+            }
+        },
+
+        // New resolver to fetch NPCs data
+        pocketNpcs: async () => {
+            try {
+                const response = await axios.get('https://pocketmortys.net/components/com_pocketmortys/json/datatables/NPCsTable_en.json');
+                return response?.data?.data?.map((pocketnpc: PocketNPCData) => ({
+                    alias: pocketnpc.alias,
+                    npc_name: pocketnpc.npc_name
+                }));
+            } catch (error) {
+                console.error("Error fetching NPCs data:", error);
+                return [];
+            }
+        },
+
+        // New resolver to fetch a specific NPC by alias
+        pocketNpc: async (_: any, args: { alias: string }) => {
+            try {
+                const response = await axios.get('https://pocketmortys.net/components/com_pocketmortys/json/datatables/NPCsTable_en.json');
+                return response.data.data.find((pocketNpc: PocketNPCData) => pocketNpc.alias === args.alias);
+            } catch (error) {
+                console.error("Error fetching NPC:", error);
+                return null;
+            }
+        },
+    }
+
     }
 };
 

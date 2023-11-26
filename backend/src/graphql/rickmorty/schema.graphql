@@ -32,6 +32,22 @@ type RickAndMortyAssociation {
     morties: [Character!]!
 }
 
+type PocketMorty {
+    assetid: ID!
+    alias: String
+    dimensions: String
+    name: String
+}
+
+type PocketNPC {
+    alias: String
+    npc_name: String
+}
+
 extend type Query {
     rickAndMortyAssociations: [RickAndMortyAssociation!]!
+    pocketmortys: [PocketMorty]
+    pocketmorty(assetid: ID!): PocketMorty
+    pocketnpcs: [PocketNPC]
+    pocketnpc(alias: String!): PocketNPC
 }
