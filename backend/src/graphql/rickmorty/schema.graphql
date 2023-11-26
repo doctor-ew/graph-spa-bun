@@ -46,8 +46,8 @@ type PocketNPC {
 
 extend type Query {
     rickAndMortyAssociations: [RickAndMortyAssociation!]!
-    pocketmortys: [PocketMorty]
-    pocketmorty(assetid: ID!): PocketMorty
-    pocketnpcs: [PocketNPC]
-    pocketnpc(alias: String!): PocketNPC
+    pocketMortys: [PocketMorty]
+    pocketMorty(assetid: ID!): PocketMorty
+    pocketNpcs: [PocketNPC]
+    pocketNpc(alias: String!): PocketNPC
 }
