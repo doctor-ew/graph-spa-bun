@@ -60,7 +60,7 @@ const RickAndMortyPage: React.FC<RickAndMortyProps> = ({ data, errors }) => {
             <h1 className="text-2xl font-bold mb-6">Rick and Morty Data</h1>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data?.rickAndMortyAssociations?.map((association) => (
-                    <div key={association.rick.id} className="bg-white rounded-lg shadow-md p-4">
+                    <div key={association.rick.id} className="bg-gray-400 rounded-lg shadow-md p-4">
                         <div className="bg-gray-200 rounded-lg overflow-hidden">
                             {/* Using background image via CSS */}
                             <div
